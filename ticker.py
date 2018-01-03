@@ -1,4 +1,4 @@
-# subscribercounter.py
+# ticker.py
 import requests
 import json
 import sys
