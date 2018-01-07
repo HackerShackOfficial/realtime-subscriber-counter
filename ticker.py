@@ -6,6 +6,9 @@ import argparse
 import schedule
 import time
 import functools
+import max7219.led as led
+from max7219.font import proportional, TINY_FONT
+from custom_font import CUSTOM_FONT
 
 # add command line arguments
 parser = argparse.ArgumentParser(description='Realtime statistics counter')
@@ -16,7 +19,35 @@ parser.add_argument('--channelId', dest='channelId',
 parser.add_argument('--crypto', dest='crypto',
                    help='The symbol for a cryptocurrency')
 
+parser.add_argument('--ticker', dest='ticker', action='store_true',
+                   help='Show a crypto ticker')
+
 args = parser.parse_args()
+
+def getCryptoTickerPriceMap():
+	cryptos = ['BTC', 'ETH', 'BCH', 'LTC', 'DOGE', 'DASH', 'XRP', 'ADA', 'XEM', 'XLM', 'MIOTA']
+	ret = {};
+
+	for c in cryptos:
+		ret[c] = getCryptoPrice(c)
+
+	return ret
+
+def formatCryptoTicker(prev, current):
+	ret = ''
+	for key in current:
+		if current[key] is not None:
+			symbol = '\xfe'
+			if key in prev:
+				new = round(float(current[key]), 2)
+				old = round(float(prev[key]), 2)
+				if old > new:
+					symbol = '\x1f'
+				elif new > old:
+					symbol = '\x1e'
+			ret = ret + key + symbol + current[key] + ' '
+
+	return ret
 
 def getCryptoPrice(c):
 	"""
@@ -32,7 +63,7 @@ def getCryptoPrice(c):
 		data = json.loads(r.text)
 		for coin in data:
 			if (coin['symbol'] == symbol):
-				price = str(round(float(coin['price_usd']), 2))
+				price = "{0:.2f}".format(round(float(coin['price_usd']), 2))
 				return price
 
 		print "Cryptocurrency not found in response data"
@@ -64,20 +95,40 @@ def updateCounter(job_func, *args, **kwargs):
 	"""
 
 	ret = functools.partial(job_func, *args, **kwargs)()
-	print ret
+	device.show_message(ret, font=proportional(TINY_FONT))
 
 
 if __name__ == '__main__':
+	device = led.matrix(cascaded = 4)
+	device.orientation(90)
 	if (args.crypto is not None):
 		schedule.every(5).seconds.do(updateCounter, getCryptoPrice, args.crypto)
+		
+		# Run the scheduler
+		while True:
+			schedule.run_pending()
+			time.sleep(1)
+
 	elif (args.apiKey is not None and args.channelId is not None):
 		schedule.every(5).seconds.do(updateCounter, getSubscribers, args.channelId, args.apiKey)
+
+		# Run the scheduler
+		while True:
+			schedule.run_pending()
+			time.sleep(1)
+
+	elif (args.ticker is not None):
+
+		oldPriceMap = {}
+		while True:
+			ret = getCryptoTickerPriceMap()
+			msg = formatCryptoTicker(oldPriceMap, ret)
+			device.show_message(msg + '   ', font=proportional(CUSTOM_FONT))
+			oldPriceMap = ret
+
 	else: # No arguments provided
 		sys.exit(0);
 
-	# Run the scheduler
-	while True:
-		schedule.run_pending()
-		time.sleep(1)
+	
 
 
