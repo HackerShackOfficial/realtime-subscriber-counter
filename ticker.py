@@ -119,13 +119,17 @@ if __name__ == '__main__':
 
 	elif (args.ticker is not None):
 
-		oldPriceMap = {}
+		oldPriceMap = {} # keeps track of the last price
+		diffPriceMap = {} # keeps track of the last record
 		while True:
 			ret = getCryptoTickerPriceMap()
 			msg = formatCryptoTicker(oldPriceMap, ret)
 			device.show_message(msg + '   ', font=proportional(CUSTOM_FONT))
-			if cmp(ret, oldPriceMap) != 0: # update the oldpricemap to retain diff symbols
-				oldPriceMap = ret
+
+			# if the last record and the current price are differnt, set the old price map to the last record
+			if cmp(ret, diffPriceMap) != 0:
+				oldPriceMap = diffPriceMap
+				diffPriceMap = ret
 
 	else: # No arguments provided
 		sys.exit(0);
