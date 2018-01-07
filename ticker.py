@@ -124,7 +124,8 @@ if __name__ == '__main__':
 			ret = getCryptoTickerPriceMap()
 			msg = formatCryptoTicker(oldPriceMap, ret)
 			device.show_message(msg + '   ', font=proportional(CUSTOM_FONT))
-			oldPriceMap = ret
+			if cmp(ret, oldPriceMap) != 0: # update the oldpricemap to retain diff symbols
+				oldPriceMap = ret
 
 	else: # No arguments provided
 		sys.exit(0);
