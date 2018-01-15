@@ -1,2 +1,3 @@
-requests
-schedule
+requests==2.4.3
+schedule==0.4.3
+max7219==0.2.3
