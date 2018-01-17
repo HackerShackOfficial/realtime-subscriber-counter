@@ -99,7 +99,7 @@ def updateCounter(job_func, *args, **kwargs):
 
 
 if __name__ == '__main__':
-	device = led.matrix(cascaded = 4)
+	device = led.matrix(cascaded = 8)
 	device.orientation(90)
 	if (args.crypto is not None):
 		schedule.every(5).seconds.do(updateCounter, getCryptoPrice, args.crypto)
@@ -124,7 +124,7 @@ if __name__ == '__main__':
 		while True:
 			ret = getCryptoTickerPriceMap()
 			msg = formatCryptoTicker(oldPriceMap, ret)
-			device.show_message(msg + '   ', font=proportional(CUSTOM_FONT))
+			device.show_message(msg + '         ', font=proportional(CUSTOM_FONT))
 
 			# if the last record and the current price are differnt, set the old price map to the last record
 			if cmp(ret, diffPriceMap) != 0:
