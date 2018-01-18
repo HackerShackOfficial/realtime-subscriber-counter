@@ -1,6 +1,10 @@
 # Realtime Subscriber Counter / Cryptocurrency Ticker
 An LED Matrix that counts subscribers (and cryptocurrency prices) in realtime.
 
+Watch the video about how to make it (here)[https://youtu.be/HN2RRBSAsn8].
+
+See more instructions about how to make it on (hackster.io)[https://www.hackster.io/hackerhouse/realtime-cryptocurrency-ticker-youtube-subscriber-counter-0ac8c5].
+
 ## Pre-requisites
 + Python 2.7
 + pip
